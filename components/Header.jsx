@@ -6,7 +6,7 @@ import { Cookie, Sparkles } from "lucide-react";
 import { Refrigerator } from "lucide-react";
 import PricingModal from "@/components/PricingModal";
 import { Badge } from "@/components/ui/badge";
-import HowToCookModal from "./howToCookModal";
+import HowToCookModal from "./HowToCookModal";
 
 import {
   SignedIn,
