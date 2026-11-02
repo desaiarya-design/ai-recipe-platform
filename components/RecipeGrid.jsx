@@ -13,18 +13,15 @@ const RecipeGrid = ({
     backLink = "/dashboard",
 }) => {
     const { data, loading, fn: fetchMeals } = useFetch(fetchAction);
-    console.log("Loading:", loading);
-    console.log("Data:", data);
-
+ 
   useEffect(() => {
     if (value) {
         const formattedValue =
             value.charAt(0).toUpperCase() + value.slice(1);
 
-        console.log("Fetching:", formattedValue);
         fetchMeals(formattedValue);
     }
-}, [value]); // Remove fetchMeals for now
+}, [value]);
 
     const meals = data?.recipe || [];
     const displayName = value?.replace(/-/g, " ");

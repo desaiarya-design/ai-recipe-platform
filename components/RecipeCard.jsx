@@ -69,9 +69,8 @@ const RecipeCard =({ recipe, variant="default"}) =>{
 
         //more conditions
 
-        return{};
+        return {};
     };
-    console.log("Recipe received:", recipe);
 
     const data = getRecipeData();
 
@@ -82,8 +81,8 @@ const RecipeCard =({ recipe, variant="default"}) =>{
                 {data.showImage ? (
                     <div className="relative aspect-square">
                         <Image
-                        src={data.image}
-                        alt={data.title}
+                        src={data.image || "/placeholder.png"}
+                        alt={data.title || "Recipe image"}
                         fill
                         className="object-cover"
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -228,8 +227,8 @@ const RecipeCard =({ recipe, variant="default"}) =>{
                 {data.showImage ? (
                     <div className="relative w-full md:w-48 aspect-video md:aspect-square flex-shrink-0">
                         <Image
-                        src={data.image}
-                        alt={data.title}
+                        src={data.image || "/placeholder.png"}
+                        alt={data.title || "Recipe image"}
                         fill
                         className="object-cover group-hover:scale-105 transition-transform duration-500 "
                         sizes="(max-width: 768px) 100vw, 192px"

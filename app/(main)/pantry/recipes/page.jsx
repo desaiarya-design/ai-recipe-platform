@@ -33,9 +33,6 @@ useEffect(() => {
 
 
 const recipes = recipesData?.recipes || [];
-console.log("recipesData:", recipesData);
-console.log("recipes:", recipes);
-console.log("loading:", loading);
 const ingredientsUsed = recipesData?.ingredientsUsed || "";
 
   return (

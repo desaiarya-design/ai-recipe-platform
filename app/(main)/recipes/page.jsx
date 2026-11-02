@@ -49,7 +49,7 @@ const SavedRecipePages = () => {
                 <div>
                     {recipes.map((savedRecipe) => (
                         <RecipeCard
-                        key={savedRecipe.documentId}
+                        key={savedRecipe.id}
                         recipe={savedRecipe.recipe}
                         variant="list"
                         />

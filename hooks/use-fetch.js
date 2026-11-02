@@ -36,16 +36,11 @@ const useFetch = (cb) => {
     const [error, setError] = useState(null);
 
     const fn = async (...args) => {
-        console.log("Started:", args);
-
         setLoading(true);
         setError(null);
 
         try {
             const response = await cb(...args);
-
-            console.log("Response:", response);
-
             setData(response);
         } catch (error) {
             console.error("Error:", error);
@@ -53,8 +48,6 @@ const useFetch = (cb) => {
             setError(error);
             toast.error(error.message);
         } finally {
-            console.log("Finished");
-
             setLoading(false);
         }
     };

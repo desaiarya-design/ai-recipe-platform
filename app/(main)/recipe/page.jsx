@@ -63,13 +63,16 @@ function RecipeContent() {
     fn: removeFromCollection,
   } = useFetch(removeRecipeFromCollection);
 
-  // Fetch recipe on mount
+  // Reset state and fetch fresh recipe whenever the requested dish changes
   useEffect(() => {
-    if (recipeName && !recipe) {
-      const formData = new FormData();
-      formData.append("recipeName", recipeName);
-      fetchRecipe(formData);
-    }
+    if (!recipeName) return;
+    // Clear any previously displayed recipe so stale data isn't shown
+    setRecipe(null);
+    setRecipeId(null);
+    setIsSaved(false);
+    const formData = new FormData();
+    formData.append("recipeName", recipeName);
+    fetchRecipe(formData);
   }, [recipeName]);
 
   // Update recipe when data arrives
@@ -168,8 +171,6 @@ function RecipeContent() {
     );
   }
 
-  console.log(recipe, recipeData);
-
   // Error state
   if (loadingRecipe === false && !recipe) {
     return (
@@ -205,12 +206,6 @@ function RecipeContent() {
     );
   }
 
-  console.log({
-  isSaved,
-  recipeData,
-  saveData,
-});
-
   // Main recipe view
   return (
     <div className="min-h-screen bg-stone-50 pt-24 pb-16 px-4">
@@ -232,7 +227,7 @@ function RecipeContent() {
               <div className="relative w-full h-72 overflow-hidden mb-7">
                 <Image
                   src={recipe.imageUrl}
-                  alt={recipe.title}
+                  alt={recipe.title || "Recipe image"}
                   fill
                   className="object-cover"
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"

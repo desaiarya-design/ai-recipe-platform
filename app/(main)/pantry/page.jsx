@@ -1,5 +1,4 @@
 
-
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -7,7 +6,6 @@ import {Check, ChefHat, Edit2, Loader2, Package, Plus, Sparkles, Trash2, X } fro
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import useFetch from "@/hooks/use-fetch";
-import PricingModal from "@/components/PricingModal";
 import AddToPantryModal from "@/components/AddToPantryModal";
 import Link from "next/link";
 import {
@@ -16,14 +14,13 @@ import {
   updatePantryItem,
 } from "@/actions/pantry.actions";
 import { toast } from "sonner";
-import { Input } from "@base-ui/react";
 
 const PantryPage = () => {
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [items, setItems] = useState([]);
     const [editingId, setEditingId] = useState(null);
-    const [editValues, setEditValues]= useState({ name: " ", quantity: " "});
+    const [editValues, setEditValues]= useState({ name: "", quantity: ""});
 
     const {
         loading: loadingItems,
@@ -32,7 +29,6 @@ const PantryPage = () => {
     }= useFetch(getPantryItems);
 
     //Delete Items
-
     const{
         loading: deleting,
         data: deleteData,
@@ -40,28 +36,24 @@ const PantryPage = () => {
     }= useFetch(deletePantryItem);
 
     //Update Items
-
     const {
         loading: updating,
         data: updateData,
         fn: updateItem,
     }= useFetch(updatePantryItem);
 
-
     useEffect(() => {
-    fetchItems();
-}, []);
+        fetchItems();
+    }, []);
 
     //load items on mount
-
     useEffect(() => {
-    if (itemsData?.success) {
-        setItems(itemsData.items);
-    }
-}, [itemsData]);
+        if (itemsData?.success) {
+            setItems(itemsData.items);
+        }
+    }, [itemsData]);
 
-    //refresh data
-
+    //refresh after delete
     useEffect(()=>{
         if(deleteData?.success && !deleting){
             toast.success("Item removed from pantry");
@@ -69,8 +61,7 @@ const PantryPage = () => {
         }
     },[deleteData]);
 
-    //refresh updae
-
+    //refresh after update
     useEffect(()=>{
         if(updateData?.success){
             toast.success("Item updated successfully");
@@ -79,40 +70,36 @@ const PantryPage = () => {
         }
     },[updateData]);
 
-    // Handle delete 
-
+    // Handle delete — uses MongoDB _id
     const handleDelete = async(itemId) => {
         const formData = new FormData();
         formData.append("id", itemId);
         await deleteItem(formData);
-    }
+    };
 
-    //handle editing
-
+    // Handle editing — store MongoDB _id
     const startEdit = (item) =>{
-        setEditingId(item.documentId);
+        setEditingId(item._id);
         setEditValues({
             name: item.name,
             quantity: item.quantity,
         });
     };
 
-    //save edit
-
+    // Save edit — action expects "id" key
     const saveEdit = async () => {
         const formData = new FormData();
-        formData.append("itemId", editingId);
+        formData.append("id", editingId);
         formData.append("name", editValues.name);
         formData.append("quantity", editValues.quantity);
         await updateItem(formData);
     };
 
     //cancel edit
-
     const cancelEdit = () =>{
         setEditingId(null);
-        setEditValues({name: " ", quantity:" "});
-    }
+        setEditValues({name: "", quantity:""});
+    };
 
     const handleModalSuccess = () =>{
         fetchItems();
@@ -145,62 +132,52 @@ const PantryPage = () => {
                     </Button>
                 </div>
 
-                      {itemsData?.scanslimit !== undefined && (
-                        <div className="bg-white py-3 px-4 border-2 border-stone-200 inline-flex items-center gap-3">
-                            <Sparkles className="w-5 h-5 text-orange-600"/>
-                            <div className="text-sm">
-                                {itemsData.scanslimit === "unlimited" ? (
-                                    <>
-                                    <span className="text-stone-500">
-                                        {" "}
-                                        Unlimited AI scans (Pro Plan)
-                                    </span>
-                                    </>
-                                ):(
-                                    <PricingModal>
-                                        <span className="text-stone-500 cursor-pointer">
-                                            Upgrade to Pro for unlimited Pantry scans
-                                        </span>
-                                    </PricingModal>
-                                )}
-                            </div>
-                        </div>
-                    )}
-
-            </div>
-            {/* Quick Action Card - find Recipes  */}
-
-            {items.length > 0 && (
-                <Link href={"/pantry/recipes"} className="block mb-8">
-                <div className="bg-linear-to-br from-green-600 to-emerald-500 text-white p-6 border-2 border-emerald-700 hover: shadow-xl hover:translate-y-1 transition-all cursor-pointer group ">
-                    <div className="flex items-center gap-4">
-                        <div className="bg-white/30 p-3 border-2 border-white/30 group-hover: bg-white/30 transition-colors">
-                            <ChefHat className="w-8 h-8"/>
-                        </div>
-
-                        <div className="flex-1">
-                            <h3 className="font-bold text-xl mb-1">
-                                What Can I Cook Today? 
-                            </h3>
-
-                            <p>
-                                Get AI-powered recipe suggestions from your {items.length}{" "}
-                                ingredients
-                            </p>
-                        </div>
-
-                        <div className="hidden sm:block">
-                            <Badge className="bg-white/20 text-white border-2 border-white/30 font-bold uppercase tracking-wide">
-                                {items.length} items
-                            </Badge>
+                {itemsData?.scanslimit !== undefined && (
+                    <div className="bg-white py-3 px-4 border-2 border-stone-200 inline-flex items-center gap-3">
+                        <Sparkles className="w-5 h-5 text-orange-600"/>
+                        <div className="text-sm">
+                            {itemsData.scanslimit === "unlimited" ? (
+                                <span className="text-stone-500">
+                                    {" "}Unlimited AI scans (Pro Plan)
+                                </span>
+                            ):(
+                                <span className="text-stone-500">
+                                    Upgrade to Pro for unlimited Pantry scans
+                                </span>
+                            )}
                         </div>
                     </div>
-                </div>
+                )}
+            </div>
+
+            {/* Quick Action Card - find Recipes */}
+            {items.length > 0 && (
+                <Link href={"/pantry/recipes"} className="block mb-8">
+                    <div className="bg-linear-to-br from-green-600 to-emerald-500 text-white p-6 border-2 border-emerald-700 hover:shadow-xl hover:translate-y-1 transition-all cursor-pointer group">
+                        <div className="flex items-center gap-4">
+                            <div className="bg-white/30 p-3 border-2 border-white/30 transition-colors">
+                                <ChefHat className="w-8 h-8"/>
+                            </div>
+                            <div className="flex-1">
+                                <h3 className="font-bold text-xl mb-1">
+                                    What Can I Cook Today? 
+                                </h3>
+                                <p>
+                                    Get AI-powered recipe suggestions from your {items.length}{" "}
+                                    ingredients
+                                </p>
+                            </div>
+                            <div className="hidden sm:block">
+                                <Badge className="bg-white/20 text-white border-2 border-white/30 font-bold uppercase tracking-wide">
+                                    {items.length} items
+                                </Badge>
+                            </div>
+                        </div>
+                    </div>
                 </Link>
             )}
 
-            {/*  Loading State */}
-
+            {/* Loading State */}
             {loadingItems && (
                 <div className="flex flex-col items-center justify-center py-20">
                     <Loader2 className="w-12 h-12 text-orange-600 animate-spin mb-4"/>
@@ -225,12 +202,12 @@ const PantryPage = () => {
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                         {items.map((item)=> (
                             <div
-                            key={item.documentId}
+                            key={item._id}
                             className="bg-white p-5 border-2 border-stone-200 hover:border-orange-600 hover:shadow-lg transition-all"
                             >
-                                {editingId === item.documentId ? (
+                                {editingId === item._id ? (
                                     <div className="space-y-3">
-                                        <Input
+                                        <input
                                         type="text"
                                         value={editValues.name}
                                         onChange={(e)=>
@@ -256,15 +233,13 @@ const PantryPage = () => {
                                             size="sm"
                                             onClick={saveEdit}
                                             disabled={updating}
-                                            className="flex-1 bg-green-600 hover:bg-green-700 border-2 border-green-700 "
+                                            className="flex-1 bg-green-600 hover:bg-green-700 border-2 border-green-700"
                                             >
                                                 {updating ? (
                                                     <Loader2 className="w-4 h-4 animate-spin"/>
                                                 ) : (
                                                     <Check className="w-4 h-4"/>
-                                                
                                                 )}
-
                                             </Button>
                                             <Button
                                             size="sm"
@@ -280,30 +255,28 @@ const PantryPage = () => {
                                 ):(
                                     <div>
                                         <div className="flex items-start justify-between mb-3">
-                                        <div className="flex-1">
-                                            <h3 className="font-bold text-lg text-stone-900 m-1">
-                                                {item.name}
-                                            </h3>
-                                            <p className="text-stone-500 text-sm font-light">
-                                                {item.quantity}
-                                            </p>
-                                        </div>
-
-
-                                        <div className="flex gap-1">
-                                            <Button 
-                                            onClick={() => startEdit(item) }
-                                            variant="ghost"
-                                            >
-                                                <Edit2 className="w-4 h-4"/>
-                                            </Button>
-                                            <Button
-                                            onClick={()=> handleDelete(item.documentId)}
-                                            disabled={deleting}
-                                            variant="ghost"
-                                            >
-                                                <Trash2 className="w-4 h-4"/>
-                                            </Button>
+                                            <div className="flex-1">
+                                                <h3 className="font-bold text-lg text-stone-900 m-1">
+                                                    {item.name}
+                                                </h3>
+                                                <p className="text-stone-500 text-sm font-light">
+                                                    {item.quantity}
+                                                </p>
+                                            </div>
+                                            <div className="flex gap-1">
+                                                <Button 
+                                                onClick={() => startEdit(item)}
+                                                variant="ghost"
+                                                >
+                                                    <Edit2 className="w-4 h-4"/>
+                                                </Button>
+                                                <Button
+                                                onClick={()=> handleDelete(item._id)}
+                                                disabled={deleting}
+                                                variant="ghost"
+                                                >
+                                                    <Trash2 className="w-4 h-4"/>
+                                                </Button>
                                             </div>
                                         </div>
                                         <div className="text-xs text-stone-400">
@@ -317,7 +290,7 @@ const PantryPage = () => {
                 </div>
             )}
 
-            {/*Empty State */}
+            {/* Empty State */}
             {!loadingItems && items.length === 0 && (
                 <div className="bg-white p-12 text-center border-2 border-dashed border-stone-200">
                     <div className="bg-orange-50 w-20 h-20 border-2 border-orange-200 flex items-center justify-center mx-auto mb-6">
@@ -328,16 +301,15 @@ const PantryPage = () => {
                     </h3>
                 </div>
             )}
-
         </div>
 
         {/* Add to pantry modal */}
         <AddToPantryModal
-        isOpen ={isModalOpen}
+        isOpen={isModalOpen}
         onClose={() =>setIsModalOpen(false)}
         onSuccess={handleModalSuccess}/>
     </div>
-  )
-}
+  );
+};
 
 export default PantryPage;
